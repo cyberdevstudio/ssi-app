@@ -1,0 +1,51 @@
+From 44967cef0f5dc662d81a13b1411f2a4899a5b8f0 Mon Sep 17 00:00:00 2001
+From: Manus Agent <manus@agent.ai>
+Date: Mon, 2 Feb 2026 11:59:32 -0500
+Subject: [PATCH] fix: use openId instead of insertId for user registration
+
+---
+ server/localAuth.ts | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/server/localAuth.ts b/server/localAuth.ts
+index ebbea3e..1c3a93a 100644
+--- a/server/localAuth.ts
++++ b/server/localAuth.ts
+@@ -89,27 +89,28 @@ export async function registerUser(
+       return { success: false, error: "Email already registered" };
+     }
+ 
++    // Generate unique openId BEFORE insertion
++    const openId = `local_${Date.now()}_${Math.random().toString(36).substring(7)}`;
++
+     // Hash password
+     const passwordHash = await hashPassword(password);
+ 
+     // Create user
+-    const result = await db.insert(users).values({
++    await db.insert(users).values({
+       email,
+       passwordHash,
+       name,
+       organizationId,
+       role: "user",
+-      openId: `local_${Date.now()}_${Math.random().toString(36).substring(7)}`,
++      openId,
+       loginMethod: "local",
+     });
+ 
+-    const userId = Number(result.insertId);
+-
+-    // Fetch created user
++    // Fetch created user using openId (unique field)
+     const newUser = await db
+       .select()
+       .from(users)
+-      .where(eq(users.id, userId))
++      .where(eq(users.openId, openId))
+       .limit(1);
+ 
+     if (newUser.length === 0) {
+-- 
+2.34.1
+

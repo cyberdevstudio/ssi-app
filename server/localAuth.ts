@@ -89,34 +89,28 @@ export async function registerUser(
       return { success: false, error: "Email already registered" };
     }
 
+    // Generate unique openId BEFORE insertion
+    const openId = `local_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
     // Hash password
     const passwordHash = await hashPassword(password);
 
     // Create user
-    const result = await db.insert(users).values({
+    await db.insert(users).values({
       email,
       passwordHash,
       name,
       organizationId,
       role: "user",
-      openId: `local_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      openId,
       loginMethod: "local",
     });
 
-    // MySQL insertId is a bigint, convert properly
-    const userId = typeof result.insertId === 'bigint' 
-      ? Number(result.insertId) 
-      : parseInt(String(result.insertId), 10);
-
-    if (isNaN(userId)) {
-      return { success: false, error: "Failed to get user ID after creation" };
-    }
-
-    // Fetch created user
+    // Fetch created user using openId (unique field)
     const newUser = await db
       .select()
       .from(users)
-      .where(eq(users.id, userId))
+      .where(eq(users.openId, openId))
       .limit(1);
 
     if (newUser.length === 0) {

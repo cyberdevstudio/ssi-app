@@ -103,7 +103,14 @@ export async function registerUser(
       loginMethod: "local",
     });
 
-    const userId = Number(result.insertId);
+    // MySQL insertId is a bigint, convert properly
+    const userId = typeof result.insertId === 'bigint' 
+      ? Number(result.insertId) 
+      : parseInt(String(result.insertId), 10);
+
+    if (isNaN(userId)) {
+      return { success: false, error: "Failed to get user ID after creation" };
+    }
 
     // Fetch created user
     const newUser = await db

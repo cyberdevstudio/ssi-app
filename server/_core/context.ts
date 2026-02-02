@@ -32,19 +32,23 @@ export async function createContext(
       };
     }
 
-    // Try OAuth authentication first
+    // Try local authentication first (for our local auth system)
     try {
-      user = await sdk.authenticateRequest(opts.req);
-    } catch (oauthError) {
-      // OAuth failed, try local authentication
+      console.log("[Context] Trying local auth with cookie:", sessionCookie?.substring(0, 20) + "...");
+      const localAuthUser = await verifyToken(sessionCookie);
+      console.log("[Context] Local auth user:", localAuthUser);
+      if (localAuthUser) {
+        // Import db function here to avoid circular dependency
+        const { getUserById } = await import("../db");
+        user = await getUserById(localAuthUser.id);
+        console.log("[Context] User from DB:", user);
+      }
+    } catch (localError) {
+      console.log("[Context] Local auth failed:", localError);
+      // Local auth failed, try OAuth authentication
       try {
-        const localAuthUser = await verifyToken(sessionCookie);
-        if (localAuthUser) {
-          // Import db function here to avoid circular dependency
-          const { getUserById } = await import("../db");
-          user = await getUserById(localAuthUser.id);
-        }
-      } catch (localError) {
+        user = await sdk.authenticateRequest(opts.req);
+      } catch (oauthError) {
         // Both authentication methods failed
         console.debug("[Context] Both OAuth and local auth failed");
         user = null;

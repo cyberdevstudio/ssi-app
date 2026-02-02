@@ -7,16 +7,20 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { Shield } from "lucide-react";
+import { TRPCClientError } from "@trpc/client";
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const utils = trpc.useUtils();
 
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: () => {
       toast.success("Connexion réussie !");
+      // Invalidate and refetch user data
+      utils.auth.me.invalidate();
       window.location.href = "/";
     },
     onError: (error) => {

@@ -18,7 +18,7 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- Analytics (Umami) - Only loads if environment variables are set -->
-    <script>
+    <script type="module">
       if (import.meta.env.VITE_ANALYTICS_ENDPOINT && import.meta.env.VITE_ANALYTICS_WEBSITE_ID) {
         const script = document.createElement('script');
         script.defer = true;

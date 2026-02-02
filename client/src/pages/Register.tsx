@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { Shield } from "lucide-react";
+import { TRPCClientError } from "@trpc/client";
 
 export default function Register() {
   const [, setLocation] = useLocation();
@@ -15,10 +16,13 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const utils = trpc.useUtils();
 
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: () => {
       toast.success("Compte créé avec succès !");
+      // Invalidate and refetch user data
+      utils.auth.me.invalidate();
       window.location.href = "/";
     },
     onError: (error) => {

@@ -7,7 +7,7 @@ import { getDb } from "./db";
 // Keycloak configuration from environment variables
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || "http://localhost:8080";
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || "ssigrc";
-const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || "sigma-frontend";
+const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || "ssigrc-frontend";
 const KEYCLOAK_CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET || "";
 const KEYCLOAK_ADMIN_USERNAME = process.env.KEYCLOAK_ADMIN_USERNAME || "admin";
 const KEYCLOAK_ADMIN_PASSWORD = process.env.KEYCLOAK_ADMIN_PASSWORD || "admin";

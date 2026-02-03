@@ -258,6 +258,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   passwordHash: text("password_hash"),
   loginMethod: varchar("login_method", { length: 64 }),
+  keycloakId: varchar("keycloak_id", { length: 255 }),
   phone: varchar("phone", { length: 50 }),
   department: varchar("department", { length: 255 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
